@@ -1,0 +1,23 @@
+{
+  "createHttp": 201,
+  "request": {
+    "method": "PATCH",
+    "path": "/api/incidents/1793305088560",
+    "body": {
+      "status": "closed"
+    }
+  },
+  "responseHttp": 200,
+  "responseBody": {
+    "id": 1793305088560,
+    "title": "Проверка TC-06",
+    "cameraId": "CAM-01",
+    "severity": "high",
+    "description": "",
+    "status": "closed",
+    "assignee": null,
+    "createdAt": "2026-10-29T20:18:08.556Z",
+    "updatedAt": "2026-10-29T20:18:08.599Z"
+  },
+  "savedStatus": "closed"
+}

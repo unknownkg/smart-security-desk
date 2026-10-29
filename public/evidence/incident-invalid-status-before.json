@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-10-29T17:30:53.368Z",
+  "mode": "before",
+  "create": {
+    "request": {
+      "method": "POST",
+      "url": "http://127.0.0.1:58939/api/incidents",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "title": "Учебный инцидент",
+        "cameraId": "CAM-01",
+        "severity": "high"
+      }
+    },
+    "response": {
+      "status": 201,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "226",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Thu, 29 Oct 2026 17:30:53 GMT",
+        "etag": "W/\"e2-seMcwPvE4ey8zYeFXvJ4YOn62ys\"",
+        "keep-alive": "timeout=5",
+        "x-powered-by": "Express"
+      },
+      "body": {
+        "id": 1793295053341,
+        "title": "Учебный инцидент",
+        "cameraId": "CAM-01",
+        "severity": "high",
+        "description": "",
+        "status": "new",
+        "assignee": null,
+        "createdAt": "2026-10-29T17:30:53.339Z",
+        "updatedAt": "2026-10-29T17:30:53.339Z"
+      }
+    }
+  },
+  "patch": {
+    "request": {
+      "method": "PATCH",
+      "url": "http://127.0.0.1:58939/api/incidents/1793295053341",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "status": "closed"
+      }
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "connection": "keep-alive",
+        "content-length": "229",
+        "content-type": "application/json; charset=utf-8",
+        "date": "Thu, 29 Oct 2026 17:30:53 GMT",
+        "etag": "W/\"e5-UFuXraMZ8W1SER4ODPKgoSrWZVc\"",
+        "keep-alive": "timeout=5",
+        "x-powered-by": "Express"
+      },
+      "body": {
+        "id": 1793295053341,
+        "title": "Учебный инцидент",
+        "cameraId": "CAM-01",
+        "severity": "high",
+        "description": "",
+        "status": "closed",
+        "assignee": null,
+        "createdAt": "2026-10-29T17:30:53.339Z",
+        "updatedAt": "2026-10-29T17:30:53.365Z"
+      }
+    }
+  }
+}

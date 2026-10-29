@@ -1,0 +1,229 @@
+{
+  "description": "Обезличенная сводка фактического прогона Newman: удалены заголовки, адреса и тела запросов; результаты проверок и коды ответов сохранены.",
+  "started": "2026-10-29T17:29:32.149Z",
+  "completed": "2026-10-29T17:29:33.024Z",
+  "stats": {
+    "iterations": {
+      "total": 1,
+      "pending": 0,
+      "failed": 0
+    },
+    "items": {
+      "total": 8,
+      "pending": 0,
+      "failed": 0
+    },
+    "scripts": {
+      "total": 10,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequests": {
+      "total": 8,
+      "pending": 0,
+      "failed": 0
+    },
+    "requests": {
+      "total": 9,
+      "pending": 0,
+      "failed": 0
+    },
+    "tests": {
+      "total": 8,
+      "pending": 0,
+      "failed": 0
+    },
+    "assertions": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "testScripts": {
+      "total": 8,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequestScripts": {
+      "total": 2,
+      "pending": 0,
+      "failed": 0
+    }
+  },
+  "failures": [],
+  "executions": [
+    {
+      "name": "TC-01 — GET health",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "HTTP 200",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "status = ok",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-02 — POST valid event",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "HTTP 201",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Событие сохранено с заданными полями",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-03 — POST event без cameraId",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "HTTP 400",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Ответ содержит ошибку",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-04 — POST incident",
+      "status": 201,
+      "assertions": [
+        {
+          "name": "HTTP 201",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Инцидент создан со статусом new и ID",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-05 — PATCH in_progress",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "ID из TC-04 задан",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "HTTP 200",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Статус изменён на in_progress",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-06 — PATCH недопустимого статуса closed",
+      "status": 400,
+      "assertions": [
+        {
+          "name": "ID из TC-04 задан",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "HTTP 400",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Ответ содержит ошибку",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-07 — PATCH неизвестной камеры",
+      "status": 404,
+      "assertions": [
+        {
+          "name": "HTTP 404",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Ответ содержит ошибку",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-08 — GET incidents?status=new",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "TC-08: тестовый инцидент создан",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "HTTP 200",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Все возвращённые инциденты имеют статус new",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "В результате есть созданный тестовый инцидент",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    {
+      "name": "TC-08 — GET incidents?status=new",
+      "status": 200,
+      "assertions": [
+        {
+          "name": "TC-08: тестовый инцидент создан",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "HTTP 200",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "Все возвращённые инциденты имеют статус new",
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "В результате есть созданный тестовый инцидент",
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    }
+  ]
+}
