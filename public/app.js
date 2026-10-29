@@ -1,5 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
 const state = { cameras: [], events: [], incidents: [] };
+const assigneeDrafts = new Map();
 let hasLoaded = false;
 const statusLabels = { new: 'Новый', in_progress: 'В работе', resolved: 'Решён' };
 const severityLabels = { low: 'Низкая', medium: 'Средняя', high: 'Высокая' };
@@ -98,9 +99,14 @@ function renderEvents() {
 }
 
 function renderIncidents(items) {
+  $('#incident-list').querySelectorAll('.assignee-form').forEach((form) => {
+    const input = form.elements.assignee;
+    if (input.value === input.dataset.savedAssignee) assigneeDrafts.delete(form.dataset.id);
+    else assigneeDrafts.set(form.dataset.id, input.value);
+  });
   $('#incident-count').textContent = items.length;
   $('#kpi-incidents').textContent = state.incidents.filter((item) => item.status === 'new' || item.status === 'in_progress').length;
-  $('#incident-list').innerHTML = items.length ? items.map((item) => `<article class="incident ${['low', 'medium', 'high'].includes(item.severity) ? item.severity : ''}"><div class="incident-content"><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.cameraId)} · ${escapeHtml(formatDate(item.createdAt))}${item.assignee ? ` · Ответственный: ${escapeHtml(item.assignee)}` : ''}</p>${item.description ? `<p>${escapeHtml(item.description)}</p>` : ''}<div class="badges"><span class="badge ${['low', 'medium', 'high'].includes(item.severity) ? item.severity : ''}">${escapeHtml(severityLabels[item.severity] || item.severity)}</span><span class="badge ${['new', 'in_progress', 'resolved'].includes(item.status) ? item.status : ''}">${escapeHtml(statusLabels[item.status] || item.status)}</span></div><div class="incident-controls"><label for="status-${escapeHtml(item.id)}">Статус</label><select class="incident-status" id="status-${escapeHtml(item.id)}" data-id="${escapeHtml(item.id)}">${Object.entries(statusLabels).map(([value, label]) => `<option value="${value}"${item.status === value ? ' selected' : ''}>${label}</option>`).join('')}</select></div><form class="assignee-form" data-id="${escapeHtml(item.id)}"><label for="assignee-${escapeHtml(item.id)}">Ответственный</label><div class="assignee-controls"><input id="assignee-${escapeHtml(item.id)}" name="assignee" type="text" maxlength="120" value="${escapeHtml(item.assignee || '')}" placeholder="Не назначен"><button class="button secondary" type="submit">Сохранить</button></div></form></div></article>`).join('') : `<div class="empty incident-empty">${state.incidents.length ? 'Инцидентов по выбранным фильтрам нет.' : '<span class="empty-icon" aria-hidden="true">✓</span><strong>Активных инцидентов нет</strong><span>Новые и находящиеся в работе инциденты появятся здесь</span>'}</div>`;
+  $('#incident-list').innerHTML = items.length ? items.map((item) => `<article class="incident ${['low', 'medium', 'high'].includes(item.severity) ? item.severity : ''}"><div class="incident-content"><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.cameraId)} · ${escapeHtml(formatDate(item.createdAt))}${item.assignee ? ` · Ответственный: ${escapeHtml(item.assignee)}` : ''}</p>${item.description ? `<p>${escapeHtml(item.description)}</p>` : ''}<div class="badges"><span class="badge ${['low', 'medium', 'high'].includes(item.severity) ? item.severity : ''}">${escapeHtml(severityLabels[item.severity] || item.severity)}</span><span class="badge ${['new', 'in_progress', 'resolved'].includes(item.status) ? item.status : ''}">${escapeHtml(statusLabels[item.status] || item.status)}</span></div><div class="incident-controls"><label for="status-${escapeHtml(item.id)}">Статус</label><select class="incident-status" id="status-${escapeHtml(item.id)}" data-id="${escapeHtml(item.id)}">${Object.entries(statusLabels).map(([value, label]) => `<option value="${value}"${item.status === value ? ' selected' : ''}>${label}</option>`).join('')}</select></div><form class="assignee-form" data-id="${escapeHtml(item.id)}"><label for="assignee-${escapeHtml(item.id)}">Ответственный</label><div class="assignee-controls"><input id="assignee-${escapeHtml(item.id)}" name="assignee" type="text" maxlength="120" value="${escapeHtml(assigneeDrafts.has(String(item.id)) ? assigneeDrafts.get(String(item.id)) : item.assignee || '')}" data-saved-assignee="${escapeHtml(item.assignee || '')}" placeholder="Не назначен"><button class="button secondary" type="submit">Сохранить</button></div></form></div></article>`).join('') : `<div class="empty incident-empty">${state.incidents.length ? 'Инцидентов по выбранным фильтрам нет.' : '<span class="empty-icon" aria-hidden="true">✓</span><strong>Активных инцидентов нет</strong><span>Новые и находящиеся в работе инциденты появятся здесь</span>'}</div>`;
 }
 
 async function refresh() {
@@ -162,8 +168,13 @@ $('#incident-list').addEventListener('submit', async (event) => {
   if (button.disabled) return;
   button.disabled = true;
   const assignee = form.elements.assignee.value.trim();
+  const submittedValue = form.elements.assignee.value;
   try {
     await api(`/api/incidents/${encodeURIComponent(form.dataset.id)}`, {method:'PATCH', body:JSON.stringify({assignee:assignee || null})});
+    if (form.elements.assignee.value === submittedValue) {
+      assigneeDrafts.delete(form.dataset.id);
+      form.elements.assignee.dataset.savedAssignee = submittedValue;
+    }
     if (await refresh()) showSuccess('Ответственный обновлён.');
   } catch (error) { showError(error); }
   finally { button.disabled = false; }
