@@ -1,0 +1,11 @@
+Команда: node --test tests/incident-validation-regression.test.js (изолированная версия с восстановленной проверкой)
+Код выхода: 0
+✔ TC-06: недопустимый статус closed отклоняется и не сохраняется (439.7086ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 666.6603
