@@ -69,6 +69,10 @@ test('TC-04–TC-08: incidents and errors', async () => {
   assert.equal(changed.body.assignee, 'Operator-01');
   assert.equal(changed.body.status, 'in_progress');
   assert.equal((await request('/api/incidents/' + id, 'PATCH', {status: 'closed'})).status, 400);
+  const afterInvalid = await request('/api/incidents');
+  const unchanged = afterInvalid.body.find(item => item.id === id);
+  assert.equal(unchanged.status, 'in_progress');
+  assert.equal(unchanged.assignee, 'Operator-01');
   assert.equal((await request('/api/cameras/UNKNOWN', 'PATCH', {status: 'online'})).status, 404);
   assert.equal((await request('/api/incidents/999999999', 'PATCH', {status: 'resolved'})).status, 404);
   assert.equal((await request('/api/incidents', 'POST', {title: 'Неполный'})).status, 400);
