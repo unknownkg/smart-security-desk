@@ -1,0 +1,114 @@
+name: "Проверка и выпуск v1.0.0"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: smart-security-desk-release-v1.0.0
+  cancel-in-progress: false
+
+jobs:
+  test-and-release:
+    name: "Тесты и GitHub Release"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: "Получить исходный код"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Подготовить Node.js 24 LTS"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: "Установить зависимости"
+        run: npm ci
+
+      - name: "Выполнить автоматические тесты"
+        run: npm test
+
+      - name: "Проверить сохранённый результат Newman"
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const r = JSON.parse(fs.readFileSync('docs/evidence/newman-report.json', 'utf8'));
+          const stats = r.stats || {};
+          const req = stats.requests || {}, checks = stats.assertions || {};
+          if (req.total !== 9 || req.failed !== 0 || checks.total !== 20 || checks.failed !== 0 || (r.failures || []).length) {
+            throw new Error('Архивный Newman-отчёт не подтверждает 9 запросов и 20 успешных проверок');
+          }
+          console.log('Архивный отчёт Newman: 9 запросов, 20 проверок, 0 ошибок.');
+          console.log('Это не новый запуск Postman Desktop.');
+          NODE
+
+      - name: "Проверить запуск сервера и API на изолированной базе"
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/db.json "$RUNNER_TEMP/smart-security-release-db.json"
+          export DB_PATH="$RUNNER_TEMP/smart-security-release-db.json"
+          export PORT=3000
+          node server.js > "$RUNNER_TEMP/smart-security-server.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 20); do
+            if curl --silent --fail http://127.0.0.1:3000/api/health >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "$RUNNER_TEMP/smart-security-server.log"
+            exit 1
+          fi
+          node - <<'NODE'
+          (async () => {
+            const base='http://127.0.0.1:3000';
+            const health=await fetch(base+'/api/health');
+            const body=await health.json();
+            if(health.status!==200 || body.status!=='ok') throw new Error('Health не пройден');
+            for (const name of ['cameras','events','incidents']) {
+              const r=await fetch(base+'/api/'+name);
+              if(r.status!==200 || !Array.isArray(await r.json())) throw new Error('GET '+name+' не пройден');
+            }
+            const bug=await fetch(base+'/bug.html');
+            if(bug.status!==200 || !(await bug.text()).includes('Задание с багом')) throw new Error('bug.html недоступен');
+            console.log('Health, камеры, события, инциденты и bug.html доступны.');
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+      - name: "Создать подписанный описанием тег и релиз"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/v1.0.0" >/dev/null; then
+            actual="$(git rev-list -n 1 refs/tags/v1.0.0)"
+            if [ "$actual" != "$GITHUB_SHA" ]; then
+              echo "::error::Тег v1.0.0 уже указывает на другой коммит; не перезаписываем."
+              exit 1
+            fi
+          else
+            git tag -a v1.0.0 -m "Первый учебный выпуск Smart Security Desk" "$GITHUB_SHA"
+            git push origin refs/tags/v1.0.0
+          fi
+          if ! gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release create v1.0.0 --verify-tag --title "Smart Security Desk v1.0.0" --notes-file docs/RELEASE_NOTES_v1.0.0.md
+          fi
+          gh release view v1.0.0 --json url,tagName --jq '.url'
