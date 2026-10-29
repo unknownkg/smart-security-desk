@@ -27,6 +27,9 @@ module.exports = store => {
     const incident = db.incidents.find(x => String(x.id) === req.params.id);
     if (!incident) return res.status(404).json({error: 'Incident not found'});
     const body = req.body || {};
+    if (Object.hasOwn(body, 'status') && !['new', 'in_progress', 'resolved'].includes(body.status)) {
+      return res.status(400).json({error: 'Invalid incident status'});
+    }
     if (Object.hasOwn(body, 'assignee') && body.assignee !== null && typeof body.assignee !== 'string') {
       return res.status(400).json({error: 'Invalid assignee'});
     }
