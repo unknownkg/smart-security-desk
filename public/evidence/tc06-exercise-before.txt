@@ -1,0 +1,35 @@
+Примечание: локальные пути в стеке удалены; результаты теста не изменены.
+Команда: node --test tests/incident-validation-regression.test.js (изолированная версия без проверки)
+Код выхода: 1
+✖ TC-06: недопустимый статус closed отклоняется и не сохраняется (1284.5963ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1886.7551
+
+✖ failing tests:
+
+test
+[строка стека с локальным путём удалена]
+✖ TC-06: недопустимый статус closed отклоняется и не сохраняется (1284.5963ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 400
+[строка стека с локальным путём удалена]
+
+[строка стека с локальным путём удалена]
+
+[строка стека с локальным путём удалена]
+
+[строка стека с локальным путём удалена]
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

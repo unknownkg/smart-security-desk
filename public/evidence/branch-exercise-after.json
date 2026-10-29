@@ -1,0 +1,15 @@
+{
+  "createHttp": 201,
+  "request": {
+    "method": "PATCH",
+    "path": "/api/incidents/1793305124878",
+    "body": {
+      "status": "closed"
+    }
+  },
+  "responseHttp": 400,
+  "responseBody": {
+    "error": "Invalid incident status"
+  },
+  "savedStatus": "new"
+}

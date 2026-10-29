@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Smart Security Desk — центр мониторинга</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="toast.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" aria-label="Smart Security Desk — к обзору">
+        <span class="brand-mark">SD</span><span class="brand-name">SMART SECURITY<br> DESK<small>ЦЕНТР МОНИТОРИНГА</small></span>
+      </a>
+      <p class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</p>
+      <nav class="nav" aria-label="Основная навигация">
+        <a class="nav-link active" href="#dashboard"><span aria-hidden="true">▦</span> Обзор</a>
+        <a class="nav-link" href="#cameras"><span aria-hidden="true">▣</span> Видеонаблюдение</a>
+        <a class="nav-link" href="#events"><span aria-hidden="true">◇</span> Журнал событий</a>
+        <a class="nav-link" href="#incidents"><span aria-hidden="true">▤</span> Инциденты</a>
+      </nav>
+      <p class="nav-label nav-label-secondary">РАЗРАБОТКА И ТЕСТИРОВАНИЕ</p>
+      <nav class="nav nav-secondary" aria-label="Разработка и тестирование"><a class="nav-link" href="bug.html"><span aria-hidden="true">⌘</span> Задание с багом</a></nav>
+      <div class="sidebar-foot"><span class="status-dot"></span><div><strong>Локальная система</strong><small>Панель оператора</small></div></div>
+    </aside>
+    <main class="main" id="dashboard">
+      <header class="topbar"><div class="breadcrumb">СИСТЕМА <span>/</span> <strong>ЦЕНТР МОНИТОРИНГА</strong></div><div id="connection" class="connection" role="status"><span class="status-dot"></span> Подключение</div></header>
+      <div class="content">
+        <div class="page-heading">
+          <div><p class="eyebrow">ОПЕРАТИВНАЯ ОБСТАНОВКА</p><h1>Центр мониторинга</h1><p class="intro">Камеры, события и инциденты на одном рабочем экране.</p></div>
+          <div class="heading-actions"><button id="refresh" class="button secondary" type="button"><span aria-hidden="true">↻</span> Обновить обзор</button><a class="button primary" href="#create-incident"><span aria-hidden="true">＋</span> Новый инцидент</a></div>
+        </div>
+        <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+        <section class="kpis" aria-label="Ключевые показатели">
+          <article class="kpi"><div class="kpi-top"><span>Камеры на связи</span><span class="kpi-icon" aria-hidden="true">▣</span></div><strong id="kpi-online">—</strong><small>Со статусом «в сети»</small></article>
+          <article class="kpi"><div class="kpi-top"><span>Камеры не в сети</span><span class="kpi-icon" aria-hidden="true">⊘</span></div><strong id="kpi-offline">—</strong><small>Требуют проверки</small></article>
+          <article class="kpi"><div class="kpi-top"><span>События IoT</span><span class="kpi-icon" aria-hidden="true">◇</span></div><strong id="kpi-events">—</strong><small>Всего в журнале</small></article>
+          <article class="kpi critical"><div class="kpi-top"><span>Инциденты в обработке</span><span class="kpi-icon" aria-hidden="true">▤</span></div><strong id="kpi-incidents">—</strong><small>Новые и в работе</small></article>
+        </section>
+        <div class="overview-grid">
+          <section id="cameras" class="panel cameras-panel"><div class="panel-head"><div><h2>Камеры <span id="camera-count" class="count">0</span></h2><p>Видеопотоки и состояние наблюдения</p></div><span class="panel-tag">Видеонаблюдение</span></div><div id="camera-list" class="camera-grid"><div class="empty">Загрузка камер…</div></div></section>
+          <section id="incidents" class="panel incidents-panel"><div class="panel-head"><div><h2>Очередь инцидентов <span id="incident-count" class="count">0</span></h2><p>Ситуации, требующие действий</p></div></div><div class="filters"><label><span class="sr-only">Фильтр по статусу</span><select id="status-filter"><option value="">Все статусы</option><option value="new">Новые</option><option value="in_progress">В работе</option><option value="resolved">Решены</option></select></label><label><span class="sr-only">Фильтр по важности</span><select id="severity-filter"><option value="">Вся важность</option><option value="low">Низкая</option><option value="medium">Средняя</option><option value="high">Высокая</option></select></label></div><div id="incident-list" class="incident-list"><div class="empty">Загрузка инцидентов…</div></div><div class="panel-footer"><span>Управление статусом в карточке</span><a href="#create-incident">Добавить инцидент ↗</a></div></section>
+          <section id="events" class="panel events-panel"><div class="panel-head"><div><h2>Журнал событий <span id="event-count" class="count">0</span></h2><p>Последние сигналы IoT и системы</p></div><span class="panel-tag">Последние записи</span></div><div class="filters event-filters"><label><span class="sr-only">Фильтр событий по камере</span><select id="event-camera-filter"><option value="">Все камеры</option></select></label><label><span class="sr-only">Фильтр событий по важности</span><select id="event-severity-filter"><option value="">Вся важность</option><option value="low">Низкая</option><option value="medium">Средняя</option><option value="high">Высокая</option></select></label></div><div id="event-list" class="event-list"><div class="empty">Загрузка событий…</div></div></section>
+          <section id="create-incident" class="panel create-panel"><div class="panel-head"><div><h2>Новый инцидент</h2><p>Зафиксируйте ситуацию для обработки</p></div><span class="panel-tag" aria-hidden="true">＋</span></div><form id="incident-form"><label>Название <input name="title" type="text" maxlength="200" required placeholder="Что произошло?"></label><div class="form-row"><label>Камера <select name="cameraId" id="incident-camera" required><option value="">Выберите камеру</option></select></label><label>Важность <select name="severity" required><option value="low">Низкая</option><option value="medium" selected>Средняя</option><option value="high">Высокая</option></select></label></div><label>Описание <textarea name="description" rows="3" placeholder="Подробности инцидента"></textarea></label><button class="button primary submit-button" type="submit">＋ Создать инцидент</button></form></section>
+        </div>
+        <footer class="footer"><strong>SMART SECURITY DESK</strong><span>ТРПП · КС-3-24</span><span>Машуров Артур Геннадьевич — руководитель проекта, технический руководитель и ведущий разработчик; Ермолаев Никита Александрович — разработчик интерфейса и UI/UX-инженер; Каракашева Алина Таалайбековна — аналитик требований и QA-инженер.</span></footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Задание с багом — Smart Security Desk</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/#dashboard" aria-label="Smart Security Desk — к обзору"><span class="brand-mark">SD</span><span class="brand-name">SMART SECURITY<br> DESK<small>ЦЕНТР МОНИТОРИНГА</small></span></a>
+      <p class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</p>
+      <nav class="nav" aria-label="Основная навигация">
+        <a class="nav-link" href="/#dashboard"><span aria-hidden="true">▦</span> Обзор</a>
+        <a class="nav-link" href="/#cameras"><span aria-hidden="true">▣</span> Видеонаблюдение</a>
+        <a class="nav-link" href="/#events"><span aria-hidden="true">◇</span> Журнал событий</a>
+        <a class="nav-link" href="/#incidents"><span aria-hidden="true">▤</span> Инциденты</a>
+      </nav>
+      <p class="nav-label nav-label-secondary">РАЗРАБОТКА И ТЕСТИРОВАНИЕ</p>
+      <nav class="nav nav-secondary" aria-label="Разработка и тестирование"><a class="nav-link active" href="/bug.html" aria-current="page"><span aria-hidden="true">⌘</span> Задание с багом</a></nav>
+      <div class="sidebar-foot"><span class="status-dot"></span><div><strong>Учебное задание</strong><small>Тестирование API</small></div></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="breadcrumb">СИСТЕМА <span>/</span> <strong>ЗАДАНИЕ С БАГОМ</strong></div><a class="back-link" href="/#dashboard">← К панели оператора</a></header>
+      <div class="content bug-content">
+        <div class="page-heading bug-heading"><div><p class="eyebrow">РАЗРАБОТКА И ТЕСТИРОВАНИЕ</p><h1>Задание с багом</h1><p class="intro">Практическое воспроизведение, документирование и исправление ошибки проверки статуса инцидента</p></div><span class="exercise-status">Упражнение выполнено в учебной ветке</span></div>
+        <section class="bug-summary panel" aria-labelledby="task-title"><div><p class="eyebrow">УЧЕБНЫЙ СЦЕНАРИЙ</p><h2 id="task-title">Проверка статуса инцидента</h2><p>По методичке необходимо временно воспроизвести ошибочное поведение API в изолированной версии, зарегистрировать дефект, восстановить проверку и оформить исправление через GitHub workflow.</p></div><dl class="bug-facts"><div><dt>Запрос</dt><dd><code>PATCH /api/incidents/:id</code></dd></div><div><dt>Важность</dt><dd>Средняя</dd></div><div><dt>Тест</dt><dd>TC-06</dd></div><div><dt>Статус</dt><dd>Issue закрыт, PR слит</dd></div></dl></section>
+        <section class="workflow-section" aria-labelledby="workflow-title"><div class="section-title"><h2 id="workflow-title">Последовательность работы</h2><p>Рабочая ветка main не содержит намеренного дефекта.</p></div><ol class="workflow"><li><span>01</span><div><strong>Обнаружение</strong><small>Изолированная проверка выполнена</small></div></li><li><span>02</span><div><strong>Issue</strong><small>Issue #12 закрыт</small></div></li><li><span>03</span><div><strong>Исправление</strong><small>PR #13 слит в учебную ветку</small></div></li><li><span>04</span><div><strong>Проверка</strong><small>HTTP 400 подтверждён</small></div></li></ol></section>
+        <div class="bug-grid">
+          <section class="panel bug-card"><h2>Ожидаемое поведение</h2><p>Допустимые значения: <code>new</code>, <code>in_progress</code> и <code>resolved</code>. Значение <code>closed</code> должно быть отклонено.</p><div class="code-title">PATCH /api/incidents/:id</div><pre><code>{
+  "status": "closed"
+}</code></pre><div class="expected-result"><span>Ожидаемый ответ</span><strong>400 Bad Request</strong></div></section>
+          <section class="panel bug-card"><h2>Воспроизведение дефекта</h2><ol class="steps-list"><li>В изолированной версии временно отключена проверка статуса.</li><li>Отправлен PATCH-запрос со значением <code>closed</code>.</li><li>API ошибочно вернул HTTP 200 и сохранил недопустимый статус.</li><li>Фактический ответ сохранён в доказательствах.</li></ol><a class="evidence-link" href="/evidence/incident-invalid-status-before.json">Открыть ответ до восстановления ↗</a></section>
+          <section class="panel bug-card"><h2>Регистрация ошибки</h2><p class="issue-title"><code>Incident accepts invalid status</code></p><dl class="details-list"><div><dt>Expected</dt><dd>HTTP 400 Bad Request</dd></div><div><dt>Actual</dt><dd>HTTP 200 OK, статус <code>closed</code> принят</dd></div><div><dt>Severity</dt><dd>Medium</dd></div></dl><p>Шаги: создать инцидент и отправить PATCH со статусом <code>closed</code> при временно отключённой проверке. <a class="evidence-link" href="https://github.com/unknownkg/smart-security-desk/issues/12" target="_blank" rel="noopener noreferrer">Открыть GitHub Issue #12 ↗</a></p></section>
+          <section class="panel bug-card"><h2>Исправление и проверка</h2><p>После восстановления проверки тот же запрос получил HTTP 400. Дефект исправлен в ветке <code>fix/incident-validation</code>, TC-06 повторён, PR слит в <code>exercise/incident-validation</code>.</p><div class="code-title">Ответ после восстановления</div><pre><code>{
+  "error": "Invalid incident status"
+}</code></pre><a class="evidence-link" href="/evidence/incident-invalid-status-after.json">Открыть ответ после восстановления ↗</a><p class="subtle"><a class="evidence-link" href="https://github.com/unknownkg/smart-security-desk/pull/13" target="_blank" rel="noopener noreferrer">Открыть PR #13 ↗</a></p></section>
+        </div>
+        <section class="panel results-card"><div class="section-title"><h2>Результаты тестирования</h2><p>Проверка учебной ветки выполнена на изолированной базе до и после исправления.</p></div><div class="results-table-wrap"><table class="results-table"><thead><tr><th>Проверка</th><th>До восстановления</th><th>После восстановления</th></tr></thead><tbody><tr><td>PATCH status=closed</td><td><span class="result-bad">HTTP 200 — ошибка</span></td><td><span class="result-good">HTTP 400 — корректно</span></td></tr><tr><td>Проверка статуса</td><td>Отключена</td><td>Восстановлена</td></tr><tr><td>TC-06</td><td><span class="result-bad">Не пройден: 200 вместо 400</span></td><td><span class="result-good">Пройден: HTTP 400</span></td></tr></tbody></table></div><p class="subtle">Регрессионный TC-06 запущен на изолированной копии: до восстановления он завершился с ошибкой (200 вместо 400), после восстановления — успешно. После публикации учебной ветки проверка также повторена на её снимках. <a class="evidence-link" href="/evidence/branch-exercise-before.json">Ответ ветки до ↗</a> · <a class="evidence-link" href="/evidence/branch-exercise-after.json">Ответ ветки после ↗</a> <a class="evidence-link" href="/evidence/tc06-exercise-before.txt">Тест до ↗</a> · <a class="evidence-link" href="/evidence/tc06-exercise-after.txt">Тест после ↗</a> · <a class="evidence-link" href="/evidence/newman-report.json">Отчёт Newman ↗</a></p></section>
+        <section class="panel bug-card conclusion"><h2>Вывод</h2><p>Валидация не допускает некорректные данные, а негативные тесты проверяют отказ на неверном вводе. Issue фиксирует дефект, отдельная ветка изолирует исправление, а Pull Request позволяет проверить изменение до его слияния.</p><p><strong>Итог:</strong> ответы 200 и 400 подтверждены на изолированной базе; Issue #12 закрыт, PR #13 слит в учебную ветку.</p></section>
+        <footer class="footer"><strong>SMART SECURITY DESK</strong><span>ТРПП · КС-3-24</span><span>Машуров Артур Геннадьевич — руководитель проекта, технический руководитель и ведущий разработчик; Ермолаев Никита Александрович — разработчик интерфейса и UI/UX-инженер; Каракашева Алина Таалайбековна — аналитик требований и QA-инженер.</span></footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
