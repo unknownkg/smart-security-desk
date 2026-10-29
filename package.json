@@ -2,11 +2,11 @@
   "name": "smart-security-desk",
   "version": "1.0.0",
   "private": true,
-  "description": "CCTV and IoT security desk MVP",
+  "description": "Учебная система учёта камер и событий IoT",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test tests/api.test.js"
+    "test": "node --test tests/api.test.js tests/preview.test.js tests/interface.test.js tests/toast.test.js tests/incident-validation-regression.test.js"
   },
   "engines": {
     "node": ">=20"

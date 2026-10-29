@@ -26,13 +26,13 @@ async function request(url, method = 'GET', body) {
   const response = await fetch(base + url, {method, headers: {'Content-Type': 'application/json'}, ...(body === undefined ? {} : {body: JSON.stringify(body)})});
   return {status: response.status, body: await response.json()};
 }
-test('TC-01: health', async () => {
+test('TC-01: проверка сервиса', async () => {
   const r = await request('/api/health');
   assert.equal(r.status, 200);
   assert.equal(r.body.status, 'ok');
   assert.equal(r.body.service, 'smart-security-desk');
 });
-test('camera list and status validation', async () => {
+test('список камер и проверка статуса', async () => {
   const list = await request('/api/cameras');
   assert.equal(list.status, 200);
   assert.equal(list.body[0].id, 'CAM-01');
@@ -42,7 +42,7 @@ test('camera list and status validation', async () => {
   assert.notEqual(changed.body.updatedAt, '2026-10-27T10:00:00Z');
   assert.equal((await request('/api/cameras/CAM-01', 'PATCH', {status: 'broken'})).status, 400);
 });
-test('TC-02 and TC-03: event creation and required fields', async () => {
+test('TC-02 и TC-03: создание события и обязательные поля', async () => {
   const event = {type: 'motion', cameraId: 'CAM-01', severity: 'high', message: 'Движение'};
   const created = await request('/api/events', 'POST', event);
   assert.equal(created.status, 201);
@@ -54,7 +54,7 @@ test('TC-02 and TC-03: event creation and required fields', async () => {
   assert.equal(filtered.body.length, 1);
   assert.equal((await request('/api/events?severity=low')).body.length, 0);
 });
-test('TC-04–TC-08: incidents and errors', async () => {
+test('TC-04–TC-08: инциденты и ошибки', async () => {
   const created = await request('/api/incidents', 'POST', {title: 'Движение', cameraId: 'CAM-01', severity: 'high'});
   assert.equal(created.status, 201);
   assert.equal(created.body.status, 'new');
