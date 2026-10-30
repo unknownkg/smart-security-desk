@@ -1,0 +1,79 @@
+name: Выпуск версии Smart Security Desk
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Новая версия, например v1.0.1'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Проверить и выпустить версию
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Убедиться, что выпуск запущен из main
+        shell: bash
+        run: |
+          if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
+            echo 'Выпуск разрешён только из ветки main.'
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo 'Укажите корректную новую версию, например v1.0.1.'
+            exit 1
+          fi
+
+      - name: Получить исходный код и существующие теги
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Подготовить Node.js 24 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Проверить проект перед выпуском
+        run: npm test
+
+      - name: Опубликовать аннотированный тег и GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+            git fetch origin "refs/tags/$VERSION:refs/tags/$VERSION"
+            existing_commit="$(git rev-list -n 1 "$VERSION")"
+            if [ "$existing_commit" != "$GITHUB_SHA" ]; then
+              echo "::error::Версия $VERSION уже существует на другом коммите. Старые релизы не перезаписываем."
+              exit 1
+            fi
+          else
+            git tag -a "$VERSION" -m "Smart Security Desk $VERSION" "$GITHUB_SHA"
+            git push origin "refs/tags/$VERSION"
+          fi
+
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Релиз $VERSION уже опубликован; повторно не создаём."
+          else
+            gh release create "$VERSION" --verify-tag --title "Smart Security Desk $VERSION" --generate-notes
+          fi
+          gh release view "$VERSION" --json url --jq '.url'
