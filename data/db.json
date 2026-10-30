@@ -5,7 +5,7 @@
       "name": "Главный вход",
       "location": "1 этаж",
       "status": "online",
-      "previewUrl": "http://localhost:8888/cam1",
+      "previewUrl": "/media/entrance.mp4",
       "updatedAt": "2026-10-27T10:00:00Z"
     },
     {
