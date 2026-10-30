@@ -86,6 +86,15 @@ function renderCameras() {
       status.querySelector('span:last-child').textContent = 'Проверьте адрес и поддержку формата браузером';
     });
     video.src = video.dataset.src;
+    video.muted = true;
+video.autoplay = true;
+video.loop = true;
+video.playsInline = true;
+
+video.play().catch(() => {
+  // Если браузер запретил автозапуск,
+  // пользователь сможет запустить запись вручную.
+});
   });
 }
 
