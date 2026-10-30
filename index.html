@@ -6,7 +6,9 @@
   <meta name="color-scheme" content="dark">
   <title>Smart Security Desk — центр мониторинга</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="demo.css">
   <script src="toast.js" defer></script>
+  <script src="pages-demo.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -24,10 +26,11 @@
       </nav>
       <p class="nav-label nav-label-secondary">РАЗРАБОТКА И ТЕСТИРОВАНИЕ</p>
       <nav class="nav nav-secondary" aria-label="Разработка и тестирование"><a class="nav-link" href="bug.html"><span aria-hidden="true">⌘</span> Задание с багом</a></nav>
-      <div class="sidebar-foot"><span class="status-dot"></span><div><strong>Локальная система</strong><small>Панель оператора</small></div></div>
+      <div class="sidebar-foot"><span class="status-dot"></span><div><strong>Демоверсия GitHub Pages</strong><small>Панель оператора</small></div></div>
     </aside>
     <main class="main" id="dashboard">
       <header class="topbar"><div class="breadcrumb">СИСТЕМА <span>/</span> <strong>ЦЕНТР МОНИТОРИНГА</strong></div><div id="connection" class="connection" role="status"><span class="status-dot"></span> Подключение</div></header>
+      <div class="demo-banner" role="note"><strong>Публичное демо</strong><span>Данные сохраняются только в вашем браузере. Серверный API работает в локальной версии приложения.</span><button type="button" id="demo-reset">Сбросить демоданные</button></div>
       <div class="content">
         <div class="page-heading">
           <div><p class="eyebrow">ОПЕРАТИВНАЯ ОБСТАНОВКА</p><h1>Центр мониторинга</h1><p class="intro">Камеры, события и инциденты на одном рабочем экране.</p></div>
