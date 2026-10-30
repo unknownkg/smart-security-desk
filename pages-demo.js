@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const key='ssd-pages-demo-v1',originalFetch=window.fetch.bind(window),now=()=>new Date().toISOString();
-const seed=()=>({cameras:[{id:'CAM-01',name:'Главный вход',location:'1 этаж',status:'online',previewUrl:'',updatedAt:now()},{id:'CAM-02',name:'Лаборатория',location:'2 этаж',status:'offline',previewUrl:'',updatedAt:now()}],events:[{id:1,type:'motion',cameraId:'CAM-01',severity:'medium',message:'Демонстрационное событие: обнаружено движение',createdAt:now()}],incidents:[]});
+const seed=()=>({cameras:[{id:'CAM-01',name:'Главный вход',location:'1 этаж',status:'online',previewUrl:'https://unknownkg.github.io/smart-security-desk/media/entrance.mp4',updatedAt:now()},{id:'CAM-02',name:'Лаборатория',location:'2 этаж',status:'offline',previewUrl:'',updatedAt:now()}],events:[{id:1,type:'motion',cameraId:'CAM-01',severity:'medium',message:'Демонстрационное событие: обнаружено движение',createdAt:now()}],incidents:[]});
 let memory=seed();
 function read(){try{const raw=localStorage.getItem(key);if(raw){const db=JSON.parse(raw);if(['cameras','events','incidents'].every(k=>Array.isArray(db[k])))return db}}catch(e){}return JSON.parse(JSON.stringify(memory))}
 function write(db){memory=db;try{localStorage.setItem(key,JSON.stringify(db))}catch(e){}}
