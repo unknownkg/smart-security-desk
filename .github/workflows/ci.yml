@@ -1,0 +1,82 @@
+name: Проверка Smart Security Desk
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node.js 24 — тесты и API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Получить исходный код
+        uses: actions/checkout@v4
+
+      - name: Подготовить Node.js 24 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Выполнить автоматические тесты
+        run: npm test
+
+      - name: Проверить запуск API и страницы задания на отдельной базе
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/db.json "$RUNNER_TEMP/smart-security-ci-db.json"
+          export DB_PATH="$RUNNER_TEMP/smart-security-ci-db.json"
+          export PORT=3000
+          node server.js > "$RUNNER_TEMP/smart-security-ci.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for i in $(seq 1 20); do
+            if curl --silent --fail http://127.0.0.1:3000/api/health >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "$RUNNER_TEMP/smart-security-ci.log"
+            exit 1
+          fi
+
+          node - <<'NODE'
+          (async () => {
+            const base = 'http://127.0.0.1:3000';
+            const health = await fetch(base + '/api/health');
+            const payload = await health.json();
+            if (health.status !== 200 || payload.status !== 'ok') {
+              throw new Error('Проверка доступности сервера не пройдена');
+            }
+            for (const name of ['cameras', 'events', 'incidents']) {
+              const response = await fetch(base + '/api/' + name);
+              if (response.status !== 200 || !Array.isArray(await response.json())) {
+                throw new Error('Проверка GET /api/' + name + ' не пройдена');
+              }
+            }
+            const page = await fetch(base + '/bug.html');
+            if (page.status !== 200 || !(await page.text()).includes('Задание с багом')) {
+              throw new Error('Страница задания с багом недоступна');
+            }
+            console.log('Сервер, API и bug.html: проверки пройдены');
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
